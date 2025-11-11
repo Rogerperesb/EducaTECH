@@ -73,16 +73,43 @@ O projeto é dividido em dois componentes principais que se comunicam via API RE
 
 Siga os passos para rodar o projeto completo localmente.
 
-### 1. Pré-requisitos
+### 1. Pré-requisitos Iniciais
 
 * **Python 3.x** instalado.
 * **Compilador C (MinGW)**: Necessário para compilar o `avg.c`. Certifique-se de que o `gcc` está no PATH do seu sistema.
-* **Instalar bibliotecas Python:**
-    ```bash
-    pip install Flask Flask-CORS
-    ```
 
-### 2. Compilar o Módulo C
+---
+
+### 2. Dependências do Backend (Python) - OBRIGATÓRIO
+
+Para que o `server.py` funcione, ele precisa de duas bibliotecas essenciais do ecossistema Python. Você deve instalá-las usando o `pip` (gerenciador de pacotes do Python).
+
+Abra seu terminal (CMD, PowerShell ou Git Bash) e execute o comando:
+
+```bash
+pip install Flask Flask-CORS
+```
+
+#### Por que precisamos destas bibliotecas?
+
+* **`Flask`**
+    * **O que é?** É o "motor" do seu servidor backend. É um *micro-framework* web leve e poderoso.
+    * **Por que usamos?** O Python, por si só, não sabe como "ouvir" a internet. O Flask é a biblioteca que permite ao seu script `server.py` se transformar em um servidor web. Ele é responsável por:
+        1.  **"Ouvir"** em uma porta específica (no seu caso, `http://127.0.0.1:5000`).
+        2.  **Criar rotas (endpoints)**, como a rota `/api/sync`.
+        3.  **Receber requisições** (como o `POST` enviado pelo seu frontend).
+        4.  **Enviar respostas** (como o `jsonify({"mensagem": "Sucesso!"})`).
+    * *Sem o Flask, seu `server.py` é apenas um script comum. Com o Flask, ele se torna uma API.*
+
+* **`Flask-CORS`**
+    * **O que é?** É uma extensão do Flask que gerencia o **CORS** (Cross-Origin Resource Sharing).
+    * **Por que usamos? (Extremamente importante)** Por padrão, os navegadores modernos têm uma política de segurança rígida: um site só pode fazer requisições de API para o **mesmo domínio (origem)** de onde ele foi carregado.
+    * **O Problema:** Seu frontend (`sistema.html`) roda em uma origem (ex: `file://` ou `http://127.0.0.1:5500`) e seu backend (`server.py`) roda em *outra* (`http://127.0.0.1:5000`).
+    * **A Solução:** Sem o `Flask-CORS`, o navegador **bloquearia** a requisição do `scripts.js` para o `server.py`, e você veria um erro de "CORS Policy" no console. Ao adicionar `CORS(app)`, o seu servidor passa a enviar um "cabeçalho" (header) especial que diz ao navegador: *"Eu autorizo o site `127.0.0.1:5500` a fazer requisições para mim. Está tudo bem."*
+
+---
+
+### 3. Compilar o Módulo C
 
 Abra um terminal na pasta `SistemaPIM-UNIP-2025-main/c_modules` e compile o arquivo C para uma DLL:
 
@@ -95,7 +122,7 @@ gcc -shared -o avg.dll avg.c
 ```
 (Isso criará o arquivo `avg.dll` que o `c_wrapper.py` irá carregar).
 
-### 3. Iniciar o Servidor Backend (Python)
+### 4. Iniciar o Servidor Backend (Python)
 
 Em um terminal, navegue até a pasta `SistemaPIM-UNIP-2025-main` e execute o servidor Flask:
 
@@ -108,7 +135,7 @@ python server.py
 ```
 O terminal deve mostrar que o servidor está rodando em `http://127.0.0.1:5000`.
 
-### 4. Iniciar o Frontend (JavaScript)
+### 5. Iniciar o Frontend (JavaScript)
 
 Abra o arquivo `PIM2/SistemaEduFlow/sistema.html` diretamente no seu navegador.
 
@@ -116,14 +143,14 @@ Abra o arquivo `PIM2/SistemaEduFlow/sistema.html` diretamente no seu navegador.
     * **Usuário:** `prof@unip.br`
     * **Senha:** `123456`
 
-### 5. Sincronizar e Visualizar
+### 6. Sincronizar e Visualizar
 
 1.  **No Site (Frontend):** Use o sistema para criar alunos, turmas e dar notas.
 2.  Clique no botão **"Sincronizar com Backend (PIM)"**.
 3.  O alerta `Sucesso!` deve aparecer no site.
 4.  **No Backend:** Verifique o `dados.json` e o `dados_resumo.txt`; eles estarão atualizados com os dados do site.
 
-### 6. (Opcional) Visualizar com a GUI Tkinter
+### 7. (Opcional) Visualizar com a GUI Tkinter
 
 Você também pode rodar a interface gráfica antiga do backend (que agora serve como um visualizador de dados) para ver os dados sincronizados.
 
