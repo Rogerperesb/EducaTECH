@@ -1,0 +1,133 @@
+{
+    "alunos": [
+        {
+            "nome": "Aluno Bruno",
+            "matricula": "123456bruno",
+            "curso": "Análise e Desenvolvimento de Sistemas",
+            "notas": [
+                6,
+                8,
+                2
+            ],
+            "media": 5.33,
+            "status": "Muito bem, foi APROVADO.",
+            "insight": "Atenção! Revise conteúdos para melhorar sua média."
+        },
+        {
+            "nome": "João Silva ",
+            "matricula": "123456joao",
+            "curso": "Análise e Desenvolvimento de Sistemas",
+            "notas": [
+                10
+            ],
+            "media": 10.0,
+            "status": "Aprovado!",
+            "insight": "Aprovado, Excelente desempenho!"
+        },
+        {
+            "nome": "Maria Isabel",
+            "matricula": "123456maria",
+            "curso": "Análise e Desenvolvimento de Sistemas",
+            "notas": [
+                7
+            ],
+            "media": 7.0,
+            "status": "Muito bem, foi APROVADO.",
+            "insight": "Bom, mas pode melhorar."
+        },
+        {
+            "nome": "Roberto Soares",
+            "matricula": "123456roberto",
+            "curso": "Análise e Desenvolvimento de Sistemas",
+            "notas": [
+                4.5
+            ],
+            "media": 4.5,
+            "status": "Reprovado",
+            "insight": "Desempenho insuficiente, precisa reforçar os estudos."
+        },
+        {
+            "nome": "Paulo Braga",
+            "matricula": "123456paulo",
+            "curso": "Análise e Desenvolvimento de Sistemas",
+            "notas": [
+                10
+            ],
+            "media": 10.0,
+            "status": "Aprovado!",
+            "insight": "Aprovado, Excelente desempenho!"
+        }
+    ],
+    "turmas": [
+        {
+            "codigo": "ADS 2025",
+            "disciplina": "Eng. de Software",
+            "alunos": [
+                {
+                    "nome": "Aluno Bruno",
+                    "matricula": "123456bruno",
+                    "curso": "Análise e Desenvolvimento de Sistemas",
+                    "notas": [
+                        6,
+                        8,
+                        2
+                    ],
+                    "media": 5.33,
+                    "status": "Muito bem, foi APROVADO.",
+                    "insight": "Atenção! Revise conteúdos para melhorar sua média."
+                },
+                {
+                    "nome": "João Silva ",
+                    "matricula": "123456joao",
+                    "curso": "Análise e Desenvolvimento de Sistemas",
+                    "notas": [
+                        10
+                    ],
+                    "media": 10.0,
+                    "status": "Aprovado!",
+                    "insight": "Aprovado, Excelente desempenho!"
+                },
+                {
+                    "nome": "Maria Isabel",
+                    "matricula": "123456maria",
+                    "curso": "Análise e Desenvolvimento de Sistemas",
+                    "notas": [
+                        7
+                    ],
+                    "media": 7.0,
+                    "status": "Muito bem, foi APROVADO.",
+                    "insight": "Bom, mas pode melhorar."
+                }
+            ]
+        },
+        {
+            "codigo": "Software",
+            "disciplina": "Engenharia de Software Ágil",
+            "alunos": [
+                {
+                    "nome": "Roberto Soares",
+                    "matricula": "123456roberto",
+                    "curso": "Análise e Desenvolvimento de Sistemas",
+                    "notas": [
+                        4.5
+                    ],
+                    "media": 4.5,
+                    "status": "Reprovado",
+                    "insight": "Desempenho insuficiente, precisa reforçar os estudos."
+                },
+                {
+                    "nome": "Paulo Braga",
+                    "matricula": "123456paulo",
+                    "curso": "Análise e Desenvolvimento de Sistemas",
+                    "notas": [
+                        10
+                    ],
+                    "media": 10.0,
+                    "status": "Aprovado!",
+                    "insight": "Aprovado, Excelente desempenho!"
+                }
+            ]
+        }
+    ],
+    "aulas": []
+}

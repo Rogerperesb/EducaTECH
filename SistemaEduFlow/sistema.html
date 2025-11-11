@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EducaTech</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- TELA DE LOGIN -->
+<section id="loginPage">
+    <div class="login-box">
+        <h1>Sistema Acadêmico</h1>
+        <p>EducaTech- Portal do Aluno e Professor</p>
+        <div class="error-msg" id="errorMsg"></div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="emailInput">Email</label>
+                <input type="email" id="emailInput" required placeholder="seu@email.com">
+            </div>
+            <div class="form-group">
+                <label for="passwordInput">RA (Senha)</label>
+                <input type="password" id="passwordInput" required placeholder="RA ou senha">
+            </div>
+            <button type="submit" class="btn btn-primary">Entrar</button>
+        </form>
+    </div>
+</section>
+
+<!-- DASHBOARD -->
+<div id="dashboardPage">
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+    <aside class="sidebar">
+        <div class="logo">EducaTech</div>
+        <nav id="menuContainer"></nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="header">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar"></div>
+                <div>
+                    <div style="font-weight:600;color:#333" id="userName"></div>
+                    <div style="font-size:13px;color:#666" id="userEmail"></div>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="logout()">Sair</button>
+        </header>
+
+        <!-- Seção Padrão de Boas-Vindas -->
+        <section id="dashboardSection" class="content-section active">
+            <div class="stats-grid" id="statsGrid"></div>
+            <div class="card">
+                <h2>Bem-vindo(a) ao Sistema</h2>
+                <p>Use o menu lateral para navegar pelas funcionalidades.</p>
+            </div>
+        </section>
+
+        <!-- SEÇÕES DO PROFESSOR -->
+        <section id="turmasSection" class="content-section">
+            <div class="card">
+                <h2>Gerenciar Turmas</h2>
+                <button class="btn-add" onclick="openAddTurmaModal()">+ Nova Turma</button>
+                <table id="turmasTable">
+                    <thead><tr><th>Nome</th><th>Disciplina</th><th>Ano/Semestre</th><th>Ações</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="alunosSection" class="content-section">
+            <div class="card">
+                <h2>Gerenciar Alunos</h2>
+                <button class="btn-add" onclick="openAddAlunoModal()">+ Novo Aluno</button>
+                <button class="btn-add" style="background-color: #3498db;" onclick="sincronizarComPim()">Sincronizar com Backend (PIM)</button>
+                <table id="alunosTable">
+                    <thead><tr><th>Nome</th><th>Matrícula</th><th>Email</th><th>Turma</th><th>Ações</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="atividadesSection" class="content-section">
+            <div class="card">
+                <h2>Gerenciar Atividades</h2>
+                <button class="btn-add" onclick="openAddAtividadeModal()">+ Nova Atividade</button>
+                <table id="atividadesTable">
+                    <thead><tr><th>Título</th><th>Tipo</th><th>Turma</th><th>Entrega</th><th>Valor</th><th>Ações</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="notasSectionProfessor" class="content-section">
+            <div class="card">
+                <h2>Avaliar Entregas</h2>
+                <table id="entregasTable">
+                    <thead><tr><th>Atividade</th><th>Aluno</th><th>Data Entrega</th><th>Status</th><th>Nota</th><th>Ações</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="relatoriosSection" class="content-section">
+            <div class="card">
+                <h2>Gerar Relatórios</h2>
+                <button class="btn-add" onclick="gerarRelatorio()">Gerar Relatório de Alunos</button>
+                <div id="relatorioContainer"></div>
+            </div>
+        </section>
+
+        </section>
+
+        <section id="botAuxiliarSection" class="content-section">
+            <div class="card">
+                <h2>🤖 Bot Auxiliar do Professor</h2>
+                <p>Análises e sugestões proativas para ajudar na gestão das turmas.</p>
+                
+                <button class="btn-add" style="background-color: #27ae60;" onclick="runBotAnalysis()">Analisar Dados Atuais</button>
+                
+                <div id="botResultsContainer" style="margin-top: 20px;">
+                    <p>Clique no botão para gerar insights sobre suas turmas.</p>
+                </div>
+            </div>
+        </section>
+        
+        <!-- SEÇÕES DO ALUNO -->
+        <section id="atividadesAlunoSection" class="content-section">
+            <div class="card">
+                <h2>Minhas Atividades</h2>
+                <table id="atividadesAlunoTable">
+                    <thead>
+                        <tr>
+                            <th>Atividade</th>
+                            <th>Disciplina</th>
+                            <th>Data de Entrega</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="notasAlunoSection" class="content-section">
+             <div class="card">
+                <h2>Minhas Notas</h2>
+                <table id="notasAlunoTable">
+                    <thead>
+                        <tr>
+                            <th>Atividade</th>
+                            <th>Nota</th>
+                            <th>Feedback do Professor</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- Modal genérico -->
+<div id="genericModal" class="modal">
+    <div class="modal-content">
+        <h2 id="modalTitle">Título do Modal</h2>
+        <form id="modalForm">
+            <div id="modalFields"></div>
+            <div style="text-align:right;margin-top:20px">
+                <button type="submit" class="btn-primary btn" style="width:auto">Salvar</button>
+                <button type="button" class="btn-secondary" onclick="closeModal()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="scripts.js"></script>
+</body>
+</html>
+
