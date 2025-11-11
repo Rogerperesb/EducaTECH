@@ -1,195 +1,140 @@
-10# 🧠 Sistema PIM – Integração com Frontend Web
+# 🚀 EducaTECH - Sistema de Gestão Acadêmica Fullstack (PIM UNIP)
 
-## 📌 Visão Geral
+![Status](https://img.shields.io/badge/Status-Completo%20(v1.0)-success)
+![license](https://img.shields.io/badge/License-MIT-blue.svg)
 
-O **Sistema PIM** evoluiu de uma aplicação **standalone em Python** (executada via terminal ou GUI) para um **backend robusto**, capaz de se comunicar com um **frontend web moderno** — o **SistemaEduFlow**.
+**EducaTECH** é um projeto fullstack que demonstra a integração de um frontend web moderno (`SistemaEduFlow`) com um backend robusto em Python (`SistemaPIM-UNIP-2025-main`). O sistema gerencia alunos, turmas, atividades e notas, com o processamento de dados (cálculo de médias e classificação) sendo delegado a um módulo de alta performance escrito em **Linguagem C**.
 
-Agora, a gestão de alunos, turmas e atividades é feita diretamente pela interface web, enquanto o backend em Python realiza o **processamento, armazenamento e análise de dados**.  
-A comunicação entre ambos ocorre por meio de uma **API Flask**.
+## 🏛️ Arquitetura do Sistema
 
----
+O projeto é dividido em dois componentes principais que se comunicam via API REST:
 
-## ⚙️ Estrutura do Projeto
+1.  **`SistemaEduFlow` (Frontend):** A interface do usuário (UI) construída com HTML, CSS e JavaScript. É por onde professores e alunos interagem com o sistema.
+2.  **`SistemaPIM-UNIP-2025-main` (Backend):** O servidor em Python (Flask) que recebe os dados, os processa (usando o módulo C), gera insights (com o `ai_module`) e os persiste em disco (`dados.json` e `dados_resumo.txt`).
 
-### 🧩 Novo Módulo: `server.py` — *O Coração da Integração*
+### Fluxo de Sincronização de Dados
 
-- **Framework:** [Flask](https://flask.palletsprojects.com/)  
-- **Função principal:** Criação da API REST que serve de ponte entre o frontend e o backend.
-- **Endpoint principal:** `/api/sync`
+```
+  [Frontend (sistema.html)]            [Backend (server.py)]
+           |                                     |
+(1) Usuário clica em "Sincronizar"         |
+           |----(POST /api/sync com JSON)--->|
+           |                                | (2) Flask recebe os dados
+           |                                |----(c_wrapper.py)----> [Módulo C (avg.dll)]
+           |                                |                       |   (3) Calcula Média
+           |                                |<---(Média, Status)----|       e Status
+           |                                |
+           |                                | (4) ai_module.py gera "Insight"
+           |                                |
+           |                                | (5) storage.py salva "dados.json"
+           |                                |      e "dados_resumo.txt"
+           |                                |
+           |<----(JSON {Sucesso})------------| (6) Resposta 200 OK
+```
 
-#### 🔁 Processo de sincronização:
-1. O servidor escuta requisições do frontend (SistemaEduFlow).  
-2. Ao receber um `POST`, lê um JSON com listas de alunos e turmas.  
-3. Cada aluno é processado com:
-   - `c_wrapper.py` → cálculo de média/status.
-   - `ai_module.py` → geração de feedback automático.
-4. O `storage.py` salva todos os dados em `dados.json`, substituindo os antigos.
+## ✨ Funcionalidades Principais
 
-#### 🌐 Suporte a CORS
-- Implementado com **Flask-CORS** para permitir a comunicação entre navegador e servidor Python com segurança.
+### 🖥️ Frontend (SistemaEduFlow)
 
----
+* **Autenticação de Papéis:** Login separado para Professores e Alunos, com interfaces adaptativas.
+* **Gestão de Professores:** CRUD completo (Criar, Ler, Editar, Deletar) para Turmas, Alunos e Atividades.
+* **Portal do Aluno:** Permite aos alunos entregar atividades e visualizar suas notas e feedbacks.
+* **Bot Auxiliar:** Uma ferramenta proativa para professores que analisa os dados e gera insights sobre:
+    * Alunos em risco (média baixa).
+    * Sumário de desempenho por turma.
+    * Alertas de atividades atrasadas.
+* **🌳 Widget de Sustentabilidade:** Um painel no dashboard que calcula e exibe uma estimativa de folhas de papel economizadas pelo uso do sistema digital.
+* **Persistência Local:** Utiliza o `localStorage` do navegador para salvar todos os dados, permitindo que a aplicação seja usada offline e os dados persistam ao fechar o navegador.
 
-### 🧮 Módulo `c_wrapper.py` — *Mais Robusto e Portátil*
+### 🐍 Backend (SistemaPIM-UNIP-2025-main)
 
-- **Carregamento Dinâmico:**  
-  Detecta automaticamente o sistema operacional e localiza a biblioteca `avg.dll`.
-- **Fallback Automático:**  
-  Caso a DLL falhe ou não exista, o módulo usa funções Python nativas (`calcular_media_py` e `classificar_media_py`), garantindo a continuidade do sistema.
+* **API REST:** Um servidor Flask (`server.py`) com CORS configurado que expõe o endpoint `/api/sync` para receber dados do frontend.
+* **Integração C/Python:** O `c_wrapper.py` usa `ctypes` para carregar dinamicamente a biblioteca `avg.dll` (compilada em C) e chamar suas funções de cálculo.
+* **Cálculo de Performance:** O módulo `avg.c` contém a lógica em C para `calcular_media` e `classificar_media` (Aprovado/Reprovado).
+* **Robustez (Fallback):** Se a `avg.dll` falhar, o `c_wrapper.py` executa automaticamente funções de *fallback* em Python puro para garantir que o sistema não pare.
+* **Geração de Insights:** O `ai_module.py` fornece feedback textual simples (ex: "Excelente desempenho!") com base na média do aluno.
+* **Persistência de Dados:** O `storage.py` salva os dados processados em `dados.json` e gera automaticamente um relatório legível em `dados_resumo.txt`.
 
----
+## 🛠️ Stack de Tecnologias
 
-### 💾 Módulo `storage.py` — *Simplificação e Eficiência*
-
-- **Otimizado** para salvar e carregar diretamente estruturas JSON.  
-- **Geração automática de relatórios:**  
-  Ao salvar `dados.json`, o sistema também cria `dados_resumo.txt`, mantendo os relatórios sempre atualizados.
-
----
-
-### 🖥️ Módulo `gui.py` — *Interface Gráfica Atualizada*
-
-- **Compatibilidade de Dados:**  
-  Passou a ler os dados como dicionários (`aluno.get('nome')`), pois `dados.json` é a fonte principal.
-- **Nova Coluna:**  
-  Exibe o campo **“Feedback da IA”** com insights gerados durante a sincronização.
-
----
-
-### ✨ Funcionalidades do Frontend (`SistemaEduFlow`)
-
-O frontend web, desenvolvido com HTML, CSS e JavaScript (`scripts.js`, `styles.css`), oferece a interface principal para interação do usuário e inclui as seguintes funcionalidades chave:
-
-1.  **Autenticação Segura:**
-    * Login separado para professores e alunos usando `sessionStorage` para manter a sessão ativa apenas enquanto o navegador está aberto.
-    * Interface adaptativa que exibe menus e opções diferentes com base no `role` do usuário (`professor` ou `aluno`).
-
-2.  **Gestão Académica (Professor):**
-    * CRUD completo (Criar, Ler, Atualizar, Deletar) para Turmas, Alunos e Atividades.
-    * Criação automática de logins para novos alunos.
-    * Atribuição automática de "entregas pendentes" ao criar atividades para uma turma.
-    * Interface para avaliação de entregas com notas e feedback.
-
-3.  **Portal do Aluno:**
-    * Visualização de atividades pendentes ("Minhas Atividades").
-    * Funcionalidade para "Entregar" atividades, mudando o status para 'Entregue'.
-    * Consulta de notas e feedbacks do professor ("Minhas Notas").
-
-4.  **Relatórios e Sincronização:**
-    * Geração de relatórios HTML de alunos com médias e faltas (`gerarRelatorio`).
-    * Botão para sincronizar os dados do frontend com o backend Python (`sincronizarComPim`), enviando os dados para a API Flask (`/api/sync`).
-
-5.  **Bot Auxiliar (Professor):**
-    * Ferramenta proativa que analisa os dados atuais (`runBotAnalysis`) e gera insights sobre:
-        * Alunos em risco (média baixa).
-        * Sumário de desempenho por turma.
-        * Alertas de atividades atrasadas.
-        * Lembretes de atividades próximas do vencimento.
-
-6.  **🌳 Widget de Sustentabilidade (Professor):**
-    * **Visão Geral:** Um card no "Dashboard" do professor exibe uma estimativa de folhas de papel economizadas pelo uso do sistema digital.
-    * **Lógica de Cálculo:** A função `loadStats` soma o número de alunos, turmas, atividades, entregas (status 'Entregue' ou 'Avaliado') e relatórios gerados (com peso 1) para calcular o total.
-    * **Persistência:** O contador de relatórios (`relatoriosGeradosCount`) é salvo no `localStorage` através das funções `saveData` e `loadData`, garantindo que a contagem persiste entre sessões. A função `gerarRelatorio` incrementa este contador.
-    * **Estilização:** O widget possui uma classe CSS `.sustainability` em `styles.css` para personalização visual.
-
-7.  **Persistência de Dados (Frontend):**
-    * Todos os dados de turmas, alunos, atividades e entregas são salvos no `localStorage` do navegador, permitindo que o usuário continue de onde parou ao reabrir a aplicação.
-    * A função `loadData` também cria dados de exemplo na primeira execução.
-
----
+| Área | Tecnologia | Propósito |
+| :--- | :--- | :--- |
+| **Frontend** | HTML5 / CSS3 | Estrutura e estilo da interface web. |
+| **Frontend** | JavaScript (ES6+) | Lógica da aplicação, manipulação do DOM e `localStorage`. |
+| **Backend** | Python 3 | Linguagem principal do servidor. |
+| **Backend** | Flask | Micro-framework para criação da API REST (`server.py`). |
+| **Backend** | Flask-CORS | Habilita a comunicação cross-origin entre o frontend e o backend. |
+| **Core** | Linguagem C | Módulo de performance (`avg.c`) para cálculos matemáticos. |
+| **Integração**| `ctypes` (Python) | Biblioteca nativa do Python para carregar e chamar a `.dll` do C. |
+| **Visualização** | Tkinter | Usado para a GUI de visualização dos dados do backend (`gui.py`). |
+| **DevTools** | Git & GitHub | Controle de versão. |
 
 ## 🚀 Como Executar o Sistema Integrado
 
-### 🔧 Pré-requisitos
+Siga os passos para rodar o projeto completo localmente.
 
-1. **Python 3** instalado.  
-2. **Compilador C (MinGW)** configurado nas variáveis de ambiente do Windows.  
-3. Instalar dependências:
-   ```bash
-   pip install Flask Flask-Cors
-   ```
+### 1. Pré-requisitos
 
-4. **Compilar o módulo C:**
-   ```bash
-   gcc -shared -o c_modules/avg.dll c_modules/avg.c
-   ```
+* **Python 3.x** instalado.
+* **Compilador C (MinGW)**: Necessário para compilar o `avg.c`. Certifique-se de que o `gcc` está no PATH do seu sistema.
+* **Instalar bibliotecas Python:**
+    ```bash
+    pip install Flask Flask-CORS
+    ```
 
----
+### 2. Compilar o Módulo C
 
-## 🧠 Passo a Passo de Execução
+Abra um terminal na pasta `SistemaPIM-UNIP-2025-main/c_modules` e compile o arquivo C para uma DLL:
 
-### 🟩 Passo 1 – Iniciar o Servidor Backend
+```bash
+# Navegue até a pasta
+cd PIM2/SistemaPIM2/SistemaPIM-UNIP-2025-main/c_modules
 
-1. Abra um terminal (CMD, PowerShell ou VS Code).  
-2. Navegue até a pasta do backend:
-   ```bash
-   cd caminho/para/seu/projeto/SistemaPIM-UNIP-2025-main
-   ```
-3. Execute:
-   ```bash
-   python server.py
-   ```
-4. O servidor estará rodando em:  
-   **http://127.0.0.1:5000**
-
----
-
-### 🟦 Passo 2 – Utilizar o Frontend Web
-
-1. Abra o arquivo `sistema.html` (pasta *SistemaEduFlow*).  
-2. Faça login (exemplo: `prof@unip.br`).  
-3. Crie turmas, adicione alunos e atividades.  
-4. Clique em **“Sincronizar com Backend (PIM)”**.  
-   - O site exibirá uma mensagem de sucesso.  
-   - O terminal do backend mostrará:  
-     ```
-     SUCESSO: Base de dados sincronizada...
-     ```
-
----
-
-### 🟨 Passo 3 – Visualizar os Dados no Backend
-
-1. Deixe o servidor rodando.  
-2. Abra outro terminal e execute:
-   ```bash
-   python gui.py
-   ```
-3. A janela **“Sistema Acadêmico - PIM II”** exibirá todos os dados sincronizados.
-
----
-
-## 📁 Estrutura de Pastas (Resumo)
-
+# Compile o código C
+gcc -shared -o avg.dll avg.c
 ```
-SistemaPIM-UNIP-2025-main/
-│
-├── server.py
-├── gui.py
-├── c_wrapper.py
-├── storage.py
-├── ai_module.py
-├── dados.json
-├── dados_resumo.txt
-└── c_modules/
-    └── avg.dll
+(Isso criará o arquivo `avg.dll` que o `c_wrapper.py` irá carregar).
+
+### 3. Iniciar o Servidor Backend (Python)
+
+Em um terminal, navegue até a pasta `SistemaPIM-UNIP-2025-main` e execute o servidor Flask:
+
+```bash
+# Navegue até a pasta
+cd PIM2/SistemaPIM2/SistemaPIM-UNIP-2025-main
+
+# Inicie o servidor
+python server.py
+```
+O terminal deve mostrar que o servidor está rodando em `http://127.0.0.1:5000`.
+
+### 4. Iniciar o Frontend (JavaScript)
+
+Abra o arquivo `PIM2/SistemaEduFlow/sistema.html` diretamente no seu navegador.
+
+* **Login (Exemplo):**
+    * **Usuário:** `prof@unip.br`
+    * **Senha:** `123456`
+
+### 5. Sincronizar e Visualizar
+
+1.  **No Site (Frontend):** Use o sistema para criar alunos, turmas e dar notas.
+2.  Clique no botão **"Sincronizar com Backend (PIM)"**.
+3.  O alerta `Sucesso!` deve aparecer no site.
+4.  **No Backend:** Verifique o `dados.json` e o `dados_resumo.txt`; eles estarão atualizados com os dados do site.
+
+### 6. (Opcional) Visualizar com a GUI Tkinter
+
+Você também pode rodar a interface gráfica antiga do backend (que agora serve como um visualizador de dados) para ver os dados sincronizados.
+
+```bash
+# Em um NOVO terminal, na pasta SistemaPIM-UNIP-2025-main
+python gui.py
 ```
 
----
+## ⚖️ Licença
 
-## 🧾 Sumário
-
-- [x] 1. Visão Geral da Evolução  
-- [x] 2. Alterações no Backend  
-  - [x] 2.1 server.py  
-  - [x] 2.2 c_wrapper.py  
-  - [x] 2.3 storage.py  
-  - [x] 2.4 gui.py  
-- [x] 3. Execução do Sistema Integrado  
+Este projeto é distribuído sob a Licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
 
 ---
-
-## 🧑‍💻 Autor
-
-**SistemaPIM-UNIP-2025**  
-Projeto acadêmico de integração entre backend Python e frontend web (SistemaEduFlow).
+*Copyright (c) 2025 Rogerperesb*
